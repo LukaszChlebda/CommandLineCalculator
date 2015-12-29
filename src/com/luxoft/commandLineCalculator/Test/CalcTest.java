@@ -4,6 +4,7 @@ import com.luxoft.commandLineCalculator.Calc.ClearCommand;
 import com.luxoft.commandLineCalculator.Calc.ListCommand;
 import com.luxoft.commandLineCalculator.Calc.Load;
 import com.luxoft.commandLineCalculator.Calc.Save;
+import com.sun.istack.internal.NotNull;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
@@ -13,6 +14,7 @@ import java.io.*;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 /**
  * Created by dvorak on 29.12.15.
@@ -115,20 +117,25 @@ public class CalcTest <K,V> {
 
     }
 
-//    @Test
-//    public void test5DeleteObject() {
-//        File file = new File("data2.obj");
-//        assertEquals(true, file.exists());
-//        clearCommand.execute();
-//        assertEquals(false, file.exists());
-//    }
-
     @Test
-    public void test6ListCommandTest() {
-        temp = new HashMap<>();
-        temp = load.loadState("data2.obj");
-        ListCommand listCommand = new ListCommand(temp);
-        listCommand.execute();
+    public void test5DeleteObject() {
+        Map<K,V> map = load.loadState("data.obj");
+        ClearCommand clearCommand1 = new ClearCommand("data2.obj");
+        File file = new File("data2.obj");
+        assertEquals(true, file.exists());
+        clearCommand1.execute();
+        assertEquals(true, file.exists());
+        assertNotEquals(null, map);
+        map = load.loadState("data2.obj");
+        assertEquals(null, map);
     }
+
+//    @Test
+//    public void test6ListCommandTest() {
+//        temp = new HashMap<>();
+//        temp = load.loadState("data2.obj");
+//        ListCommand listCommand = new ListCommand(temp);
+//        listCommand.execute();
+//    }
 
 }
