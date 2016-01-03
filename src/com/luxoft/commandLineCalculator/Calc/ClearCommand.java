@@ -11,8 +11,9 @@ public class ClearCommand <K,V> implements Command {
     private Save save = new Save();
     private Map<K,V> map = null;
 
-    public ClearCommand(String name) {
+    public ClearCommand(String name, Map<K,V> map) {
         this.objectName = name;
+        this.map = map;
     }
 
     @Override
@@ -21,6 +22,7 @@ public class ClearCommand <K,V> implements Command {
 //        if(file.exists()) {
 //            file.delete();
 //        }
+        map.clear();
         save.saveState(map, objectName);
 
     }

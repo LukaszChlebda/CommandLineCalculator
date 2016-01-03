@@ -1,9 +1,6 @@
 package com.luxoft.commandLineCalculator.Test;
 
-import com.luxoft.commandLineCalculator.Calc.ClearCommand;
-import com.luxoft.commandLineCalculator.Calc.ListCommand;
-import com.luxoft.commandLineCalculator.Calc.Load;
-import com.luxoft.commandLineCalculator.Calc.Save;
+import com.luxoft.commandLineCalculator.Calc.*;
 import com.sun.istack.internal.NotNull;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -13,8 +10,7 @@ import org.junit.runners.MethodSorters;
 import java.io.*;
 import java.util.*;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.*;
 
 /**
  * Created by dvorak on 29.12.15.
@@ -23,119 +19,77 @@ import static org.junit.Assert.assertNotEquals;
 public class CalcTest <K,V> {
 
     Map<String, Float> calcMap;
+    Map<String, Float> storingMap;
     Save save = new Save();
     Load load = new Load();
-    ClearCommand clearCommand = new ClearCommand("data2.obj");
+
     Map<K, V> temp = null;
+    ClearCommand clearCommand;
+    CalculatorImp calculatorImp;
     @Before
     public void testPreperation() {
-
-
+        calculatorImp = new CalculatorImp();
+        clearCommand = new ClearCommand("dataTest.obj", temp);
         calcMap = new HashMap<>();
-        calcMap.put("d", 3f);
-        calcMap.put("s", 5f);
-        calcMap.put("a", 2f);
-        calcMap.put("temp0", 2f);
-        calcMap.put("temp1", 2f);
+        storingMap = new HashMap<>();
+        storingMap.put("d", 4f);
+        storingMap.put("c", 6f);
+        storingMap.put("temp_0", 4f);
+        storingMap.put("temp_1", 6f);
+        storingMap.put("temp_2", 8f);
+        storingMap.put("was", 8f);
+    }
 
+    @Test
+    public void test1veryfiCalculateInput() {
+        String input1 = "d=23*43";
+        String input2 = "32+11";
 
+        assertEquals(true, calculatorImp.verifyInput(input1));
+        assertEquals(true, calculatorImp.verifyInput(input2));
+    }
 
+    @Test
+    public void test2CalculateFormulaAndSerialize() {
+        String[] formula1 = new String[6];
+        formula1[0] = "d=2+2";
+        formula1[1] = "c=2+2*2";
+        formula1[2] = "2+2";
+        formula1[3] = "2+2*2";
+        formula1[4] = "(2*2)+4";
+        formula1[5] = "was=(2*2)+4";
+
+        calculatorImp.parseAndCalculate(formula1[0], calcMap, "dataTest.obj");
+        calculatorImp.parseAndCalculate(formula1[1], calcMap, "dataTest.obj");
+        calculatorImp.parseAndCalculate(formula1[2], calcMap, "dataTest.obj");
+        calculatorImp.parseAndCalculate(formula1[3], calcMap, "dataTest.obj");
+        calculatorImp.parseAndCalculate(formula1[4], calcMap, "dataTest.obj");
+        calculatorImp.parseAndCalculate(formula1[5], calcMap, "dataTest.obj");
+
+        save.saveState(calcMap, "dataTest.obj");
+
+        File file = new File("dataTest.obj");
+        assertTrue(file.exists());
 
     }
 
     @Test
-    public void test1Calculate() {
-        String[] resultString = new String[calcMap.size()];
-        Iterator<Map.Entry<String, Float>> iterator = calcMap.entrySet().iterator();
-        int i=0;
-        while (iterator.hasNext()) {
-            resultString[i] = iterator.next().toString();
-            i++;
-        }
-        //System.out.println(Arrays.toString(calcMap.entrySet().toArray()));
-        printArray(resultString);
+    public void test3DeserializeObject() {
+        Map<String, Float> tempMap = null;
+        tempMap = (Map)load.loadState("dataTest.obj");
+        assertNotNull(tempMap);
     }
 
     @Test
-    public void test2AddNewNumberToMap() {
-        Float add = Float.valueOf(5);
-        Float result = Float.valueOf(8);
+    public void test4CheckPerformedCalculations() {
+        Map<String, Float> tempMap = new HashMap<>();
+        tempMap.put("d", 4f);
+        tempMap.put("c", 6f);
+        tempMap.put("temp_0", 4f);
+        tempMap.put("temp_1", 6f);
+        tempMap.put("temp_2", 8f);
+        tempMap.put("was", 8f);
 
-        add +=  calcMap.get("d");
-
-        assertEquals(result, add);
+        assertEquals(storingMap, tempMap);
     }
-
-    private void printArray(String[] arrayToPrint) {
-        StringBuilder sb = new StringBuilder();
-        for(String s: arrayToPrint) {
-            sb.append(s+"\n");
-        }
-        System.out.println(sb);
-    }
-
-    private void mapToString(Map<String,Float> map, String[] stringArray) {
-        //String[] resultString = new String[map.size()];
-        Iterator<Map.Entry<String, Float>> iterator = map.entrySet().iterator();
-        int i=0;
-        while (iterator.hasNext()) {
-            stringArray[i] = iterator.next().toString();
-            i++;
-        }
-    }
-
-//    @Test
-//    public void testCSerialize() {
-//        try(FileOutputStream fileOutputStream = new FileOutputStream("data.obj");
-//            ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)) {
-//            objectOutputStream.writeObject(calcMap);
-//        }catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-    @Test
-    public void test4Deserialization() {
-        temp = new HashMap<>();// = new HashMap<>();
-        String[] stringArray = new String[calcMap.size()];
-//        try(FileInputStream fileInputStream = new FileInputStream("data.obj");
-//            ObjectInputStream objectInputStream = new ObjectInputStream(fileInputStream)) {
-//            temp = (Map)objectInputStream.readObject();
-//        }catch (IOException e) {
-//            e.printStackTrace();
-//        } catch (ClassNotFoundException e) {
-//            e.printStackTrace();
-//        }
-        temp = (load.loadState("data.obj"));
-
-        //mapToString(temp, stringArray);
-        //printArray(stringArray);
-    }
-    @Test
-    public void test3Serialize() {
-        assertEquals(true, save.saveState(calcMap, "data2.obj"));
-
-    }
-
-    @Test
-    public void test5DeleteObject() {
-        Map<K,V> map = load.loadState("data.obj");
-        ClearCommand clearCommand1 = new ClearCommand("data2.obj");
-        File file = new File("data2.obj");
-        assertEquals(true, file.exists());
-        clearCommand1.execute();
-        assertEquals(true, file.exists());
-        assertNotEquals(null, map);
-        map = load.loadState("data2.obj");
-        assertEquals(null, map);
-    }
-
-//    @Test
-//    public void test6ListCommandTest() {
-//        temp = new HashMap<>();
-//        temp = load.loadState("data2.obj");
-//        ListCommand listCommand = new ListCommand(temp);
-//        listCommand.execute();
-//    }
-
 }

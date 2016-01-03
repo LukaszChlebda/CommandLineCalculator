@@ -9,7 +9,6 @@ import java.util.Map;
 public class Load <K,V> implements Serializable{
 
     public Map<K,V> loadState(String objectName) {
-        boolean result = false;
         File file = new File(objectName);
         if(file.exists()) {
             try(FileInputStream fileInputStream = new FileInputStream(objectName);

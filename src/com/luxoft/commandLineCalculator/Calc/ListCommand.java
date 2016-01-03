@@ -11,14 +11,22 @@ public class ListCommand <K,V> implements Command {
     private String[] resultString = null;
 
     public ListCommand(Map<K,V> map) {
-        this.map = map;
-         resultString = new String[map.size()];
+        if(!map.isEmpty()) {
+            this.map = map;
+            resultString = new String[map.size()];
+        }
+        else {
+            System.out.println("Memory empty ");
+        }
     }
 
     @Override
     public void execute() {
-        mapToString();
-        printArray();
+        if(map != null) {
+            mapToString();
+            printArray();
+        }
+
     }
 
     private void mapToString() {

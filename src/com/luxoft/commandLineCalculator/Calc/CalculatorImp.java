@@ -1,56 +1,67 @@
 package com.luxoft.commandLineCalculator.Calc;
 
-import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by dvorak on 29.12.15.
  */
 public class CalculatorImp {
-
-    private boolean verifyInput(String inputArray) {
-        boolean resul = true;
+    String patternTemp3 = "[a-zA-Z0-9+-=/*()]*";
+    String patternTemp2 = "[a-zA-Z]*[=][a-zA-Z0-9+-=/*()]*";
+    public boolean verifyInput(String inputArray) {
+        boolean result = false;
         boolean flag = true;
         int index = 0;
-        String[] pattern = new String[5];
+        String pattern1;
 
         String temp = "[a-zA-z][=][[0-9][+]]*";
-        pattern[0] = "help";
-        pattern[1] = "list";
-        pattern[2] = "clear";
-        pattern[3] = "[a-zA-z][-]";
-        pattern[4] = "[0-9][\\+]||[\\-]||[\\*]||[\\/]";
+        String patterntemp = "[a-zA-z][-]";
+        pattern1 = "[0-9][\\+]||[\\-]||[\\*]||[\\/]";
 
-//        while(flag && index < inputArray.length()) {
-//            if(!inputArray[index].matches(temp)) {
-//                resul = false;
-//                flag = false;
-//            }
-//            index++;
-//        }
-        return resul;
+
+        if(inputArray.matches(patternTemp2) || inputArray.matches(patternTemp3)) {
+            result = true;
+        }
+        return result;
     }
 
-    public void test(String args) {
-//        String[][] tab = new String[args.length][2];
-//        Map<String, char[] > calculatorMap = new HashMap<>();
-//        boolean flag = true;
-//        int index = 0;
-//        while(flag && index < args.length) {
-//            if(args[index].equals("+") || args[index].equals("-") || args[index].equals("*") || args[index].equals("/")) {
-//                tab[index-1][0] = args[index-1];
-//                tab[index-1][1] = args[index+1];
-//                //calculatorMap.put(args[index], tab[0] = args[index-1].charAt(0) )
-//            }
-//        }
-//
-//        if(verifyInput(args)) {
-//            System.out.println("He's alive ");
-//        }else {
-//            System.out.println("He's dead ");
-//        }
+    public <K,V> void parseAndCalculate(String args, Map<String,Float> map, String objectSaveName) {
+        Save save = new Save();
+        String variableName = null;
+        Float finalResult = null;
+        StartCalculations orderOfOpeations = new StartCalculations();
+        if(args.matches(patternTemp2)) {
+            String formula = null;
+            int indexOfEqualsSign = 0;
+            if(args.contains("=")) {
+                indexOfEqualsSign= args.indexOf("=");
+                formula= args.substring(indexOfEqualsSign+1, args.length());
+            }else {
+                formula = args;
+            }
+            variableName = args.substring(0,indexOfEqualsSign);
+            finalResult = Float.valueOf(orderOfOpeations.calculate(formula));
+            System.out.println(variableName + " = " + finalResult);
+            map.put(variableName, finalResult);
+            save.saveState(map, objectSaveName);
+        }
+        else {
 
+            int i=0;
+            String variableName2 = "temp_"+i;
+            boolean flag = true;
+            while(flag) {
+                if(!map.containsKey(variableName2)) {
+                    flag = false;
+                }else {
+                    i++;
+                    variableName2 = "temp_"+i;
+                }
+            }
+            finalResult=Float.valueOf(orderOfOpeations.calculate(args));
+            System.out.println(variableName2 + " = " + finalResult);
+            map.put(variableName2, finalResult);
+            save.saveState(map, objectSaveName);
+        }
     }
 }

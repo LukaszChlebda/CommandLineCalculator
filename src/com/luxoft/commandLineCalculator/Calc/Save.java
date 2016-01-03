@@ -3,9 +3,6 @@ package com.luxoft.commandLineCalculator.Calc;
 import java.io.*;
 import java.util.Map;
 
-/**
- * Created by dvorak on 29.12.15.
- */
 public class Save <K,V> implements Serializable {
 
     public boolean saveState(Map<K,V> map, String objectName) {
