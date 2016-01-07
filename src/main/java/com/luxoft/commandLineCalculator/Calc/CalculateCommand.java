@@ -15,7 +15,7 @@ public class CalculateCommand implements Command{
         this.map = map;
     }
 
-    @Override
+
     public void execute() {
         calculatorImp.parseAndCalculate(argumetToCalculate, map, "data.obj");
     }
